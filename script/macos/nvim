@@ -1,0 +1,5 @@
+pip3 install --upgrade neovim
+curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+find nvim -type f | while read f; do t=~/.config/$f; mkdir -p $(dirname $t); ln -vsf $(realpath $f) $t; done
+nvim +PlugInstall +qall
+ln -vsf nvim-qt /usr/local/bin/gnvim

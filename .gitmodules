@@ -1,0 +1,9 @@
+[submodule "vendor/dracula/terminal.app"]
+	path = vendor/dracula/terminal.app
+	url = https://github.com/dracula/terminal.app.git
+[submodule "vendor/kcrawford/dockutil"]
+	path = vendor/kcrawford/dockutil
+	url = https://github.com/kcrawford/dockutil.git
+[submodule "vendor/dracula/mintty"]
+	path = vendor/dracula/mintty
+	url = https://github.com/dracula/mintty.git

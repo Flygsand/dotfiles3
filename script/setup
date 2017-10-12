@@ -1,0 +1,11 @@
+#!/bin/sh
+
+realpath() {
+  perl -MCwd -e 'print Cwd::abs_path shift' $1
+}
+
+git submodule update --recursive --remote
+sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+PATH="$PWD/vendor/kcrawford/dockutil/scripts:$PATH"
+for f in script/macos/*; do . "$f"; done

@@ -1,0 +1,307 @@
+###############################################################################
+# General UI/UX                                                               #
+###############################################################################
+
+# Set computer name
+sudo scutil --set ComputerName "lakitu"
+sudo scutil --set HostName "lakitu"
+sudo scutil --set LocalHostName "lakitu"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "lakitu"
+
+# Set standby delay to 24 hours (default is 1 hour)
+sudo pmset -a standbydelay 86400
+
+# Disable the sound effects on boot
+sudo nvram SystemAudioVolume=" "
+
+# Expand save panel by default
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+
+# Expand print panel by default
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
+
+# Save to disk (not to iCloud) by default
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+
+# Automatically quit printer app once the print jobs complete
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+# Disable the “Are you sure you want to open this application?” dialog
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+# Disable Resume system-wide
+defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
+
+# Restart automatically if the computer freezes
+sudo systemsetup -setrestartfreeze on
+
+# Never go into computer sleep mode
+sudo systemsetup -setcomputersleep Off > /dev/null
+
+# Disable typing "helpers"
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+# Install mononoki font
+( f=$(mktemp); curl -sSLo $f https://github.com/madmalik/mononoki/releases/download/1.2/mononoki.zip; unzip -od /Library/Fonts $f *.ttf )
+
+
+###############################################################################
+# SSD-specific tweaks                                                         #
+###############################################################################
+
+# Disable hibernation (speeds up entering sleep mode)
+sudo pmset -a hibernatemode 0
+
+# Remove the sleep image file to save disk space
+sudo rm -f /private/var/vm/sleepimage
+sudo touch /private/var/vm/sleepimage
+sudo chflags uchg /private/var/vm/sleepimage
+
+
+###############################################################################
+# Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
+###############################################################################
+
+# Trackpad: map bottom right corner to right-click
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.trackpadCornerClickBehavior -int 1
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
+
+# Disable “natural” (Lion-style) scrolling
+defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+
+# Enable full keyboard access for all controls
+# (e.g. enable Tab in modal dialogs)
+defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+
+# Disable press-and-hold for keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Set a blazingly fast keyboard repeat rate
+defaults write NSGlobalDomain KeyRepeat -int 1
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# Set language and text formats
+defaults write NSGlobalDomain AppleLanguages -array "en"
+defaults write NSGlobalDomain AppleLocale -string "en_US@currency=EUR"
+defaults write com.apple.systempreferences AppleIntlCustomFormat -dict-add "AppleIntlCustomLocale" "en_US"
+defaults write NSGlobalDomain AppleMeasurementUnits -string "Centimeters"
+defaults write NSGlobalDomain AppleMetricUnits -bool true
+defaults write NSGlobalDomain AppleFirstWeekday -dict "gregorian" 2
+defaults write com.apple.iCal "first day of week" -int 1
+defaults write NSGlobalDomain AppleICUForce24HourTime -bool true
+defaults write NSGlobalDomain AppleICUDateFormatStrings -dict-add "1" "yyyy-MM-dd"
+defaults write NSGlobalDomain AppleICUDateFormatStrings -dict-add "2" "d MMM yyyy"
+defaults write NSGlobalDomain AppleICUDateFormatStrings -dict-add "3" "d MMMM yyyy"
+defaults write NSGlobalDomain AppleICUDateFormatStrings -dict-add "4" "EEEE, d MMMM yyyy"
+defaults write NSGlobalDomain AppleICUTimeFormatStrings -dict-add "1" "HH:mm"
+defaults write NSGlobalDomain AppleICUTimeFormatStrings -dict-add "2" "HH:mm:ss"
+defaults write NSGlobalDomain AppleICUTimeFormatStrings -dict-add "3" "HH:mm:ss z"
+defaults write NSGlobalDomain AppleICUTimeFormatStrings -dict-add "4" "HH:mm:ss z"
+defaults write com.apple.systempreferences AppleIntlCustomFormat -dict-add "AppleIntlCustomICUDictionary" "{'AppleICUDateFormatStrings'={'1'='yyy-MM-dd';'2'='d MMM yyyy';'3'='d MMMM yyyy';'4'='EEEE, d MMMM yyyy';};'AppleICUTimeFormatStrings'={'1'='HH:mm';'2'='HH:mm:ss';'3'='HH:mm:ss z';'4'='H:mm:ss z';};}"
+defaults write com.apple.menuextra.clock DateFormat -string "HH:mm"
+
+
+# Set the timezone
+sudo systemsetup -settimezone "Europe/Stockholm" > /dev/null
+
+
+###############################################################################
+# Screen                                                                      #
+###############################################################################
+
+# Require password immediately after sleep or screen saver begins
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# Save screenshots to the desktop
+defaults write com.apple.screencapture location -string "${HOME}/Desktop"
+
+# Save screenshots in PNG format
+defaults write com.apple.screencapture type -string "png"
+
+# Enable subpixel font rendering on non-Apple LCDs
+defaults write NSGlobalDomain AppleFontSmoothing -int 1
+
+# Enable HiDPI display modes
+sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
+
+
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+
+# Set home directory as the default location for new Finder windows
+defaults write com.apple.finder NewWindowTarget -string "PfLo"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+
+# Finder: show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# Finder: show status bar
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# Finder: show path bar
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Display full POSIX path as Finder window title
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+# When performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# Enable spring loading for directories
+defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+
+# Remove the spring loading delay for directories
+defaults write NSGlobalDomain com.apple.springing.delay -float 0
+
+# Avoid creating .DS_Store files on network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# Disable disk image verification
+defaults write com.apple.frameworks.diskimages skip-verify -bool true
+defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
+defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
+
+# Enable snap-to-grid for icons on the desktop and in other icon views
+/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+
+# Use column view in all Finder windows by default
+defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
+
+# Disable the warning before emptying the Trash
+defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# Enable AirDrop over Ethernet and on unsupported Macs running Lion
+defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
+
+# Show the ~/Library folder
+chflags nohidden ~/Library
+
+# Show the /Volumes folder
+sudo chflags nohidden /Volumes
+
+# Expand the following File Info panes:
+# “General”, “Open with”, and “Sharing & Permissions”
+defaults write com.apple.finder FXInfoPanesExpanded -dict \
+	General -bool true \
+	OpenWith -bool true \
+	Privileges -bool true
+
+
+###############################################################################
+# Dock, Dashboard, and hot corners                                            #
+###############################################################################
+
+# Set up Dock items
+dockutil --remove all
+dockutil --add "/Applications/Mail.app"
+dockutil --add "/Applications/Calendar.app"
+dockutil --add "/Applications/App Store.app"
+dockutil --add "/Applications/System Preferences.app"
+dockutil --add "/Applications/Spotify.app"
+dockutil --add "/Applications/Sequel Pro.app"
+dockutil --add "/Applications/Google Chrome.app"
+dockutil --add "/Applications/Slack.app"
+dockutil --add "/Applications/Utilities/Terminal.app"
+
+
+###############################################################################
+# Terminal                                                                    #
+###############################################################################
+
+# Only use UTF-8 in Terminal.app
+defaults write com.apple.terminal StringEncodings -array 4
+
+# Set custom appearance
+osascript <<EOD
+tell application "Terminal"
+	local allOpenedWindows
+	local initialOpenedWindows
+	local windowID
+
+	set initialOpenedWindows to id of every window
+	do shell script "open '$PWD/vendor/dracula/terminal.app/Dracula.terminal'"
+	delay 1
+	set default settings to settings set "Dracula"
+	set font size of default settings to 14
+	set font name of default settings to "mononoki"
+	set allOpenedWindows to id of every window
+	repeat with windowID in allOpenedWindows
+		if initialOpenedWindows does not contain windowID then
+			close (every window whose id is windowID)
+		else
+			set current settings of tabs of (every window whose id is windowID) to settings set "Dracula"
+		end if
+	end repeat
+end tell
+EOD
+
+
+###############################################################################
+# Address Book, Dashboard, iCal, TextEdit, and Disk Utility                   #
+###############################################################################
+
+# Use plain text mode for new TextEdit documents
+defaults write com.apple.TextEdit RichText -int 0
+
+# Open and save files as UTF-8 in TextEdit
+defaults write com.apple.TextEdit PlainTextEncoding -int 4
+defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
+
+
+###############################################################################
+# Photos                                                                      #
+###############################################################################
+
+# Prevent Photos from opening automatically when devices are plugged in
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+
+
+###############################################################################
+# Google Chrome & Google Chrome Canary                                        #
+###############################################################################
+
+# Expand the print dialog by default
+defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
+defaults write com.google.Chrome.canary PMPrintingExpandedStateForPrint2 -bool true
+
+
+###############################################################################
+# Kill affected applications                                                  #
+###############################################################################
+
+for app in "Activity Monitor" \
+	"Address Book" \
+	"Calendar" \
+	"cfprefsd" \
+	"Contacts" \
+	"Dock" \
+	"Finder" \
+	"Google Chrome Canary" \
+	"Google Chrome" \
+	"Mail" \
+	"Messages" \
+	"Photos" \
+	"Safari" \
+	"SystemUIServer" \
+	"iCal"; do
+	killall "${app}" &> /dev/null
+done

@@ -1,0 +1,2 @@
+ln -vsf $(realpath Brewfile) ~/.Brewfile
+brew bundle check --global || brew bundle --global

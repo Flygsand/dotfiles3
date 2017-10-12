@@ -1,0 +1,5 @@
+git clone https://github.com/zplug/zplug ~/.zplug
+ln -vsf $(realpath zshrc) ~/.zshrc
+ln -vsf $(realpath zshenv) ~/.zshenv
+sudo chsh -s /usr/local/bin/zsh $USER
+/usr/local/bin/zsh -c "source ~/.zshrc; zplug install"
